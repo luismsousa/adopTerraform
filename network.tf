@@ -1,15 +1,15 @@
 
-resource "aws_subnet" "luisAdopSubnet" {
+resource "aws_subnet" "AdopSubnet" {
   vpc_id     = "${var.aws_vpc}"
   cidr_block = "172.31.64.0/28"
 
   tags {
-    Name = "luisAdopSubnet"
+    Name = "AdopSubnet"
   }
 }
 
-resource "aws_security_group" "luisADOPSecurityGroup" {
-  name        = "luisADOPSecurityGroup"
+resource "aws_security_group" "ADOPSecurityGroup" {
+  name        = "ADOPSecurityGroup"
   description = "Allow ADOP inbound traffic"
 
   ingress {
@@ -51,7 +51,7 @@ resource "aws_security_group" "luisADOPSecurityGroup" {
     cidr_blocks     = ["0.0.0.0/0"]
   }
   tags {
-    Name = "luisADOPSecurityGroup"
+    Name = "ADOPSecurityGroup"
   }
 }
 
