@@ -17,4 +17,3 @@ resource "aws_instance" "foo" {
     cpu_credits = "unlimited"
   }
 }
-»
