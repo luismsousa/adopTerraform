@@ -14,6 +14,6 @@ variable "ami_id" {
   default = "ami-7abd0209"
 }
 
-variable "CONFIRM_DESTROY" {
-  default = 0
+variable "public_key" {
+  default = ""
 }

@@ -1,7 +1,14 @@
-resource "aws_instance" "Adop" {
+resource "aws_key_pair" "ADOPKey" {
+  key_name   = "terraformADOPKey"
+  public_key = "${var.public_key}"
+}
+
+resource "aws_instance" "ADOPInstance" {
   ami = "${var.ami_id}"
   instance_type = "m4.xlarge"
   vpc_security_group_ids = ["${aws_security_group.ADOPSecurityGroup.id}"]
+  subnet_id = "${aws_subnet.AdopSubnet.id}"
+  key_name = "terraformADOPKey"
 
   root_block_device {
     volume_type = "gp2"
