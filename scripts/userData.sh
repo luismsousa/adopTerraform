@@ -48,9 +48,8 @@ curl -L https://github.com/docker/compose/releases/download/1.7.1/docker-compose
 chmod +x /usr/bin/docker-compose
 
 echo '=========================== Running Docker Compose =========================='
-export IP=$(hostname --ip-address)
-export PUBLIC_IP=$(curl http://instance-data/latest/meta-data/public-ipv4)
-export PRIVATE_IP=$(curl http://instance-data/latest/meta-data/local-ipv4)
+export PUBLIC_IP=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
+export PRIVATE_IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
 export JENKINS_TOKEN=gAsuE35s
 export DOCKER_HOST=tcp://${PRIVATE_IP}:2375
 set -e

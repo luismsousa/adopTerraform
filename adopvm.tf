@@ -10,6 +10,7 @@ data "template_file" "ADOPInit" {
     adop_username = "${var.adop_username}"
     adop_password = "${var.adop_password}"
     s3_bucket_name = "${aws_s3_bucket.temp_adop_credentials.id}"
+    key_name = "${aws_key_pair.ADOPKey.id}"
   }
 }
 
