@@ -54,7 +54,7 @@ resource "aws_instance" "ADOPInstance" {
       Name = "Adop"
   }
 
-  depends_on = ["aws_internet_gateway.igw"]
+  depends_on = ["aws_route.route"]
 }
 
 
