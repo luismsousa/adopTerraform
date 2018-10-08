@@ -13,3 +13,7 @@ variable "aws_secret_key" {
 variable "ami_id" {
   default = "ami-7abd0209"
 }
+
+variable "CONFIRM_DESTROY" {
+  default = 0
+}
