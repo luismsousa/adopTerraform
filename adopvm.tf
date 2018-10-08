@@ -1,5 +1,5 @@
 resource "aws_instance" "Adop" {
-  ami = ["${var.ami_id}"] 
+  ami = "${var.ami_id}"
   instance_type = "m4.xlarge"
   vpc_security_group_ids = ["${aws_security_group.ADOPSecurityGroup.id}"]
 
@@ -31,16 +31,14 @@ resource "aws_instance" "Adop" {
   }
 
   user_data = <<-EOF
-  
-#!/bin/bash
-## Getting UserData Script
-curl -L https://raw.githubusercontent.com/luismsousa/adopTerraform/master/scripts/userData.sh > ~/userData.sh
-chmod +x ~/userData.sh
-## Running UserData Script
-cd ~/
-./userData.sh
-
-EOF
+  #!/bin/bash
+  ## Getting UserData Script
+  curl -L https://raw.githubusercontent.com/luismsousa/adopTerraform/master/scripts/userData.sh > ~/userData.sh
+  chmod +x ~/userData.sh
+  ## Running UserData Script
+  cd ~/
+  ./userData.sh
+  EOF
 
   tags{
       Name = "Adop"
