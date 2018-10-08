@@ -1,7 +1,3 @@
-variable "aws_vpc" {
-  default = ""
-}
-
 variable "aws_access_key" {
   default = ""
 }
@@ -15,5 +11,13 @@ variable "ami_id" {
 }
 
 variable "public_key" {
+  default = ""
+}
+
+variable "adop_username" {
+  default = ""
+}
+
+variable "adop_password" {
   default = ""
 }

@@ -50,32 +50,32 @@ chmod +x /usr/bin/docker-compose
 echo '=========================== Running Docker Compose =========================='
 export IP=$(hostname --ip-address)
 export PUBLIC_IP=$(curl http://instance-data/latest/meta-data/public-ipv4)
-export INITIAL_ADMIN_USER=${AdopUsername}
-export INITIAL_ADMIN_PASSWORD_PLAIN=${AdopUserPassword}
+export PRIVATE_IP=$(curl http://instance-data/latest/meta-data/local-ipv4)
 export JENKINS_TOKEN=gAsuE35s
-export DOCKER_HOST=tcp://${!PUBLIC_IP}:2375
+export DOCKER_HOST=tcp://${PRIVATE_IP}:2375
 set -e
 mkdir -p /data && cd /data
 git clone https://github.com/Accenture/adop-docker-compose
 cd /data/adop-docker-compose
 export METADATA_URL='http://169.254.169.254/latest/meta-data'
-export MAC_ADDRESS=$(curl -s ${!METADATA_URL}/network/interfaces/macs/)
-export AWS_VPC_ID=$(curl -s ${!METADATA_URL}/network/interfaces/macs/${!MAC_ADDRESS}/vpc-id/)
-export AWS_SUBNET_ID=$(curl -s ${!METADATA_URL}/network/interfaces/macs/${!MAC_ADDRESS}/subnet-id/)
-export AWS_AZ=$(curl -s ${!METADATA_URL}/placement/availability-zone)
-export AWS_DEFAULT_REGION=${!AWS_AZ%?}
-echo "export AWS_VPC_ID=${!AWS_VPC_ID}" > conf/provider/env.provider.aws.sh
-echo "export AWS_SUBNET_ID=${!AWS_SUBNET_ID}" >> conf/provider/env.provider.aws.sh 
-echo "export AWS_DEFAULT_REGION=${!AWS_DEFAULT_REGION}" >> conf/provider/env.provider.aws.sh 
+export MAC_ADDRESS=$(curl -s ${METADATA_URL}/network/interfaces/macs/)
+export AWS_VPC_ID=$(curl -s ${METADATA_URL}/network/interfaces/macs/${MAC_ADDRESS}/vpc-id/)
+export AWS_SUBNET_ID=$(curl -s ${METADATA_URL}/network/interfaces/macs/${MAC_ADDRESS}/subnet-id/)
+export AWS_AZ=$(curl -s ${METADATA_URL}/placement/availability-zone)
+export AWS_DEFAULT_REGION=${AWS_AZ%?}
+echo "export AWS_VPC_ID=${AWS_VPC_ID}" > conf/provider/env.provider.aws.sh
+echo "export AWS_SUBNET_ID=${AWS_SUBNET_ID}" >> conf/provider/env.provider.aws.sh 
+echo "export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}" >> conf/provider/env.provider.aws.sh 
 echo "export AWS_INSTANCE_TYPE='t2.large'" >> conf/provider/env.provider.aws.sh
 echo "export AWS_KEYPAIR=${KeyName}" >> conf/provider/env.provider.aws.sh
-./adop compose -i ${!PUBLIC_IP} -f etc/aws/default.yml init
+./adop compose -i ${PUBLIC_IP} -f etc/aws/default.yml init
 sleep 10
-./adop certbot gen-export-certs "registry.${!PUBLIC_IP}.nip.io" registry
+./adop certbot gen-export-certs "registry.${PUBLIC_IP}.nip.io" registry
 
 echo '=========================== Setting up ADOP-C =========================='
-until [[ $(curl -X GET -s ${!INITIAL_ADMIN_USER}:${!INITIAL_ADMIN_PASSWORD_PLAIN}@${!PUBLIC_IP}/jenkins/job/Load_Platform/lastBuild/api/json?pretty=true|grep result|cut -d$' ' -f5|sed 's|[^a-zA-Z]||g') == SUCCESS ]]; do echo "Load_Platform job not finished, sleeping for 5s"; sleep 5; done
-./adop target set -t http://${!PUBLIC_IP} -u ${!INITIAL_ADMIN_USER} -p ${!INITIAL_ADMIN_PASSWORD_PLAIN}
+until [[ $(curl -X GET -s ${INITIAL_ADMIN_USER}:${INITIAL_ADMIN_PASSWORD_PLAIN}@${PUBLIC_IP}/jenkins/job/Load_Platform/lastBuild/api/json?pretty=true|grep result|cut -d$' ' -f5|sed 's|[^a-zA-Z]||g') == SUCCESS ]]; do echo "Load_Platform job not finished, sleeping for 5s"; sleep 5; done
+./adop target set -t http://${PUBLIC_IP} -u ${INITIAL_ADMIN_USER} -p ${INITIAL_ADMIN_PASSWORD_PLAIN}
 set +e
+aws s3 cp platform.secrets.sh s3://${SecretS3BucketStore}/platform.secrets.sh
 
 echo "=========================== ADOP-C setup complete ==========================="
