@@ -2,7 +2,7 @@
 resource "aws_subnet" "AdopSubnet" {
   vpc_id     = "${var.aws_vpc}"
   cidr_block = "172.31.64.0/28"
-
+  map_public_ip_on_launch = true
   tags {
     Name = "AdopSubnet"
   }
