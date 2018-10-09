@@ -1,6 +1,6 @@
 #!/bin/bash
 ## Getting UserData Script
-curl -L https://raw.githubusercontent.com/luismsousa/adopTerraform/master/scripts/userData.sh > ~/userData.sh
+curl -L https://raw.githubusercontent.com/luismsousa/adopTerraform/master/aws/1-tier/scripts/userData.sh > ~/userData.sh
 chmod +x ~/userData.sh
 
 ## Set Vars
