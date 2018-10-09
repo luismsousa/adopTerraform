@@ -4,7 +4,14 @@ This repository contains a hardened, 2-tiered implementation of the [DevOps Plat
 The Terraform templates in this repository implement the following network architecture:
 
 
+
 # THIS DOCUMENT IS IN DRAFT STATE
+
+## TODO
+* Flow Logs
+
+
+
 #Architecture DRAFT
 
 The architecture has been decomposed into the following fine-grained layers.
