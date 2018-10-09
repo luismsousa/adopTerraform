@@ -13,11 +13,6 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
-data "aws_route_table" "selected" {
-  vpc_id = "${aws_vpc.AdopVPC.id}"
-  depends_on = ["aws_internet_gateway.igw"]
-}
-
 ##### Elastic IPs
 resource "aws_eip" "NATGw1Eip" {
   vpc                       = true
@@ -71,6 +66,8 @@ resource "aws_subnet" "PrivateSubnet1" {
 }
 
 
+##### NAT Gateways
+
 resource "aws_nat_gateway" "NATgw1" {
   allocation_id = "${aws_eip.NATGw1Eip.id}"
   subnet_id     = "${aws_subnet.PublicSubnet1.id}"
@@ -87,3 +84,50 @@ resource "aws_nat_gateway" "NATgw2" {
     Name = "gw NAT 2"
   }
 }
+
+##### RouteTables
+
+resource "aws_default_route_table" "defaultRT" {
+  default_route_table_id = "${aws_vpc.AdopVPC.default_route_table_id}"
+
+  route {
+      cidr_block = "0.0.0.0/0"
+      gateway_id = "${aws_internet_gateway.igw.id}"
+  }
+
+  tags {
+    Name = "default table"
+  }
+  
+}
+
+
+resource "aws_route_table_association" "publicRoute1" {
+  subnet_id      = "${aws_subnet.PublicSubnet1.id}"
+  route_table_id = "${aws_default_route_table.defaultRT.id}"
+  
+}
+
+resource "aws_route_table_association" "publicRoute2" {
+  subnet_id      = "${aws_subnet.PublicSubnet2.id}"
+  route_table_id = "${aws_default_route_table.defaultRT.id}"
+  
+}
+
+resource "aws_route_table" "privateRT" {
+    route {
+      cidr_block = "0.0.0.0/0"
+      nat_gateway_id = "${aws_nat_gateway.NATgw1.id}"
+    }
+  vpc_id = "${aws_vpc.AdopVPC.id}"
+
+  tags {
+    Name = "Private RT"
+  }
+}
+
+resource "aws_route_table_association" "privateRTAssociation" {
+    route_table_id = "${aws_route_table.privateRT.id}"
+    subnet_id = "${aws_subnet.PrivateSubnet1.id}"
+}
+
