@@ -22,8 +22,9 @@ All Empty Vars are defined in TFE Vars.
 * ~~add user-data repo~~
     * ~~having issues with big init script~~
 * ~~add VPC level network~~
-    * add EIP
+    * ~~add EIP~~
 * add 2 tiered-network and move ADOP to a private Subnet
 * add Azure
 * add GCP
 * clean Folder Structure
+    * done-ish
