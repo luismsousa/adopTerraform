@@ -12,15 +12,6 @@ resource "azurerm_network_interface" "adopMainNic" {
   }
 }
 
-data "template_file" "ADOPInit" {
-  template = "${file("${path.module}/scripts/init.tpl")}"
-
-  vars {
-    adop_username = "${var.adop_username}"
-    adop_password = "${var.adop_password}"
-  }
-}
-
 resource "azurerm_virtual_machine" "adopVM" {
   name                  = "adop-vm"
   location              = "${azurerm_resource_group.sandbox.location}"
