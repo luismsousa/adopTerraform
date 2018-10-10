@@ -23,8 +23,14 @@ All Empty Vars are defined in TFE Vars.
     * ~~having issues with big init script~~
 * ~~add VPC level network~~
     * ~~add EIP~~
-* add 2 tiered-network and move ADOP to a private Subnet
+* add AWS
+   * ~~1 tier~~
+   * 2 tier
 * add Azure
+   * ~~1 tier~~
+   * 2 tier
 * add GCP
+   * 1 tier
+   * 2 tier
 * clean Folder Structure
     * done-ish
