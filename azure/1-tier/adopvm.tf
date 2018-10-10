@@ -7,7 +7,7 @@ resource "azurerm_network_interface" "adopMainNic" {
     name                          = "standard"
     subnet_id                     = "${azurerm_subnet.sandboxSubnet.id}"
     private_ip_address_allocation = "static"
-    private_ip_address = "172.31.64.10"
+    private_ip_address = "172.31.64.10" ## TODO: need to make this dinamic but static
     public_ip_address_id = "${azurerm_public_ip.adopEIP.id}"
   }
 }
@@ -21,7 +21,7 @@ data "template_file" "ADOPInit" {
   }
 }
 
-resource "azurerm_virtual_machine" "main" {
+resource "azurerm_virtual_machine" "adopVM" {
   name                  = "adop-vm"
   location              = "${azurerm_resource_group.sandbox.location}"
   resource_group_name   = "${azurerm_resource_group.sandbox.name}"
@@ -52,7 +52,6 @@ resource "azurerm_virtual_machine" "main" {
   os_profile{
       computer_name = "ADOP"
       admin_username = "centos"
-      custom_data = "${data.template_file.ADOPInit.rendered}"
   }
   os_profile_linux_config {
       disable_password_authentication = true
@@ -61,4 +60,21 @@ resource "azurerm_virtual_machine" "main" {
           path = "/home/centos/.ssh/authorized_keys"
       }
   }
+}
+
+resource "azurerm_virtual_machine_extension" "adopUserData" {
+  name                 = "adopSetup"
+  location             = "${azurerm_resource_group.sandbox.location}"
+  resource_group_name  = "${azurerm_resource_group.sandbox.name}"
+  virtual_machine_name = "${azurerm_virtual_machine.adopVM.name}"
+  publisher            = "Microsoft.Azure.Extensions"
+  type                 = "CustomScript"
+  type_handler_version = "2.0"
+
+  settings = <<SETTINGS
+    {
+        "commandToExecute": "${data.template_file.ADOPInit.rendered}"
+    }
+SETTINGS
+
 }

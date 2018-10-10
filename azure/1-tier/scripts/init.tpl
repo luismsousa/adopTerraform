@@ -15,3 +15,5 @@ export INITIAL_ADMIN_PASSWORD_PLAIN=${adop_password}
 ## Running UserData Script
 cd ~/
 ./userData.sh
+
+exit 0
