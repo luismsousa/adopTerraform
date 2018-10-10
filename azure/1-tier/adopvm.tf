@@ -73,7 +73,7 @@ resource "azurerm_virtual_machine_extension" "adopUserData" {
 
   settings = <<SETTINGS
     {
-        "commandToExecute": "${data.template_file.ADOPInit.rendered}"
+        "commandToExecute": "sleep 30 && curl -L https://raw.githubusercontent.com/luismsousa/adopTerraform/master/azure/1-tier/scripts/userData.sh > ~/userData.sh && chmod +x ~/userData.sh && export INITIAL_ADMIN_USER=${var.adop_username} && export INITIAL_ADMIN_PASSWORD_PLAIN=${var.adop_password} && cd ~/ && ./userData.sh"
     }
 SETTINGS
 
