@@ -34,7 +34,7 @@ curl -L https://github.com/docker/compose/releases/download/1.7.1/docker-compose
 chmod +x /usr/bin/docker-compose
 
 
-export METADATA_API='?api-version=&format=text'
+export METADATA_API='?api-version=2018-04-02&format=text'
 export METADATA_URL='http://169.254.169.254/metadata/instance'
 echo '=========================== Running Docker Compose =========================='
 export PUBLIC_IP=$(curl -s -H Metadata:true "${METADATA_URL}/network/interface/0/ipv4/ipAddress/0/publicIpAddress${METADATA_API}")
