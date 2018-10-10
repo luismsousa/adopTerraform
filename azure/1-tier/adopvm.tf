@@ -7,7 +7,7 @@ resource "azurerm_network_interface" "adopMainNic" {
     name                          = "standard"
     subnet_id                     = "${azurerm_subnet.sandboxSubnet.id}"
     private_ip_address_allocation = "static"
-    private_ip_address = "172.31.64.15"
+    private_ip_address = "172.31.64.10"
     public_ip_address_id = "${azurerm_public_ip.adopEIP.id}"
   }
 }
