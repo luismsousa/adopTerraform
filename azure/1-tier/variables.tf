@@ -14,3 +14,16 @@ variable "client_secret" {
 variable "tenant_id" {
   default = ""
 }
+
+variable "public_key" {
+  default = ""
+}
+
+
+variable "adop_username" {
+  default = ""
+}
+
+variable "adop_password" {
+  default = ""
+}
