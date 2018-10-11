@@ -221,25 +221,25 @@ resource "aws_security_group" "ProxySecurityGroup" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["${aws_eip.NATGw1Eip.public_ip}"]
+    cidr_blocks = ["${aws_eip.NATGw1Eip.public_ip}/32"]
   }
   ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["${aws_eip.NATGw1Eip.public_ip}"]
+    cidr_blocks = ["${aws_eip.NATGw1Eip.public_ip}/32"]
   }
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["${aws_eip.NATGw2Eip.public_ip}"]
+    cidr_blocks = ["${aws_eip.NATGw2Eip.public_ip}/32"]
   }
   ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["${aws_eip.NATGw2Eip.public_ip}"]
+    cidr_blocks = ["${aws_eip.NATGw2Eip.public_ip}/32"]
   }
   egress {
     from_port       = 0
@@ -261,19 +261,19 @@ resource "aws_security_group" "OuterProxySecurityGroup" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["${aws_security_group.ProxySecurityGroup.id}"]
+    prefix_list_ids = ["${aws_security_group.ProxySecurityGroup.id}"]
   }
   ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["${aws_security_group.ProxySecurityGroup.id}"]
+    prefix_list_ids = ["${aws_security_group.ProxySecurityGroup.id}"]
   }
   egress {
     from_port       = 0
     to_port         = 0
     protocol        = "-1"
-    cidr_blocks     = ["0.0.0.0/0"]
+    prefix_list_ids     = ["0.0.0.0/0"]
   }
   tags {
     Name = "OuterProxySecurityGroup"
