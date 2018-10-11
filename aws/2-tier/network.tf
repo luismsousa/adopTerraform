@@ -101,7 +101,6 @@ resource "aws_default_route_table" "defaultRT" {
   
 }
 
-
 resource "aws_route_table_association" "publicRoute1" {
   subnet_id      = "${aws_subnet.PublicSubnet1.id}"
   route_table_id = "${aws_default_route_table.defaultRT.id}"
@@ -124,10 +123,60 @@ resource "aws_route_table" "privateRT" {
   tags {
     Name = "Private RT"
   }
+  depends_on = ["aws_route_table_association.publicRoute1"]
 }
 
 resource "aws_route_table_association" "privateRTAssociation" {
     route_table_id = "${aws_route_table.privateRT.id}"
     subnet_id = "${aws_subnet.PrivateSubnet1.id}"
+}
+
+
+resource "aws_security_group" "ADOPSecurityGroup" {
+  name        = "ADOPSecurityGroup"
+  description = "Allow ADOP inbound traffic"
+  vpc_id     = "${aws_vpc.AdopVPC.id}"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${aws_vpc.AdopVPC.cidr_block}"]
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["${aws_vpc.AdopVPC.cidr_block}"]
+  }
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["${aws_vpc.AdopVPC.cidr_block}"]
+  }
+  ingress {
+    from_port   = 2376
+    to_port     = 2376
+    protocol    = "tcp"
+    cidr_blocks = ["${aws_vpc.AdopVPC.cidr_block}"]
+  }
+  ingress {
+    from_port   = 25826
+    to_port     = 25826
+    protocol    = "udp"
+    cidr_blocks = ["${aws_vpc.AdopVPC.cidr_block}"]
+  }
+
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
+  tags {
+    Name = "ADOPSecurityGroup"
+  }
 }
 
