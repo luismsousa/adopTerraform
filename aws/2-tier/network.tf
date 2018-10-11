@@ -283,7 +283,7 @@ resource "aws_security_group" "OuterProxySecurityGroup" {
 resource "aws_elb" "ProxyELB" {
   name               = "ProxyELB"
   availability_zones = ["${aws_subnet.PublicSubnet1.availability_zone}", "${aws_subnet.PublicSubnet2.availability_zone}"]
-  security_groups = ["${aws_security_group.ELBSecurityGroup.id}", "${aws_security_group.ProxySecurityGroup}"]
+  security_groups = ["${aws_security_group.ELBSecurityGroup.id}", "${aws_security_group.ProxySecurityGroup.id}"]
 
   listener {
     instance_port     = 80
@@ -304,14 +304,16 @@ resource "aws_elb" "ProxyELB" {
     healthy_threshold   = 2
     unhealthy_threshold = 2
     timeout             = 3
-    target              = "TCP:80/"
+    target              = "TCP:80"
     interval            = 30
   }
 
-  instances                   = ["${aws_instance.ADOPInstance.id}"]
   idle_timeout                = 600
+  cross_zone_load_balancing   = true
+  idle_timeout                = 400
 
   tags {
     Name = "ProxyELB"
   }
 }
+
