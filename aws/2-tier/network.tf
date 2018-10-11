@@ -132,6 +132,9 @@ resource "aws_route_table_association" "privateRTAssociation" {
 }
 
 
+
+##### Security Groups
+
 resource "aws_security_group" "ADOPSecurityGroup" {
   name        = "ADOPSecurityGroup"
   description = "Allow ADOP inbound traffic"
@@ -180,3 +183,135 @@ resource "aws_security_group" "ADOPSecurityGroup" {
   }
 }
 
+resource "aws_security_group" "ELBSecurityGroup" {
+  name        = "ELBSecurityGroup"
+  description = "Public Proxy Security Group"
+  vpc_id     = "${aws_vpc.AdopVPC.id}"
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
+  tags {
+    Name = "ELBSecurityGroup"
+  }
+}
+
+resource "aws_security_group" "ProxySecurityGroup" {
+  name        = "ProxySecurityGroup"
+  description = "Proxy Security Group"
+  vpc_id     = "${aws_vpc.AdopVPC.id}"
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["${aws_eip.NATGw1Eip.public_ip}"]
+  }
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["${aws_eip.NATGw1Eip.public_ip}"]
+  }
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["${aws_eip.NATGw2Eip.public_ip}"]
+  }
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["${aws_eip.NATGw2Eip.public_ip}"]
+  }
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
+  tags {
+    Name = "ProxySecurityGroup"
+  }
+}
+
+resource "aws_security_group" "OuterProxySecurityGroup" {
+  name        = "OuterProxySecurityGroup"
+  description = "Outer Proxy Security Group"
+  vpc_id     = "${aws_vpc.AdopVPC.id}"
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["${aws_security_group.ProxySecurityGroup.id}"]
+  }
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["${aws_security_group.ProxySecurityGroup.id}"]
+  }
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
+  tags {
+    Name = "OuterProxySecurityGroup"
+  }
+}
+
+resource "aws_elb" "ProxyELB" {
+  name               = "ProxyELB"
+  availability_zones = ["${aws_subnet.PublicSubnet1.availability_zone}", "${aws_subnet.PublicSubnet2.availability_zone}"]
+  security_groups = ["${aws_security_group.ELBSecurityGroup.id}", "${aws_security_group.ProxySecurityGroup}"]
+
+  listener {
+    instance_port     = 80
+    instance_protocol = "http"
+    lb_port           = 80
+    lb_protocol       = "http"
+  }
+
+  listener {
+    instance_port      = 443
+    instance_protocol  = "http"
+    lb_port            = 443
+    lb_protocol        = "http" #need to modify
+    #ssl_certificate_id = "arn:aws:iam::123456789012:server-certificate/certName"
+  }
+
+  health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 3
+    target              = "TCP:80/"
+    interval            = 30
+  }
+
+  instances                   = ["${aws_instance.ADOPInstance.id}"]
+  idle_timeout                = 600
+
+  tags {
+    Name = "ProxyELB"
+  }
+}
