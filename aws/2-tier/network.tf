@@ -282,7 +282,7 @@ resource "aws_security_group" "OuterProxySecurityGroup" {
 
 resource "aws_elb" "ProxyELB" {
   name               = "ProxyELB"
-  availability_zones = ["${aws_subnet.PublicSubnet1.availability_zone}", "${aws_subnet.PublicSubnet2.availability_zone}"]
+  subnets = ["${aws_subnet.PublicSubnet1.id}", "${aws_subnet.PublicSubnet2.id}"]
   security_groups = ["${aws_security_group.ELBSecurityGroup.id}", "${aws_security_group.ProxySecurityGroup.id}"]
 
   listener {
