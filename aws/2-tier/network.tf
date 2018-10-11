@@ -34,7 +34,8 @@ resource "aws_subnet" "PublicSubnet1" {
   vpc_id = "${aws_vpc.AdopVPC.id}"
   cidr_block = "172.31.0.0/28"
   map_public_ip_on_launch = true
-  
+  availability_zone = "eu-west-1a"
+
   tags {
     Name = "PublicSubnet1"
   }
@@ -45,6 +46,8 @@ resource "aws_subnet" "PublicSubnet2" {
   vpc_id = "${aws_vpc.AdopVPC.id}"
   cidr_block = "172.31.32.0/28"
   map_public_ip_on_launch = true
+  availability_zone = "eu-west-1b"
+
   
   tags {
     Name = "PublicSubnet2"
@@ -212,8 +215,8 @@ resource "aws_security_group" "ELBSecurityGroup" {
   }
 }
 
-resource "aws_security_group" "ProxySecurityGroup" {
-  name        = "ProxySecurityGroup"
+resource "aws_security_group" "PublicElbSecurityGroup" {
+  name        = "PublicElbSecurityGroup"
   description = "Proxy Security Group"
   vpc_id     = "${aws_vpc.AdopVPC.id}"
 
@@ -248,7 +251,7 @@ resource "aws_security_group" "ProxySecurityGroup" {
     cidr_blocks     = ["0.0.0.0/0"]
   }
   tags {
-    Name = "ProxySecurityGroup"
+    Name = "PublicElbSecurityGroup"
   }
 }
 
@@ -261,19 +264,19 @@ resource "aws_security_group" "OuterProxySecurityGroup" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    prefix_list_ids = ["${aws_security_group.ProxySecurityGroup.id}"]
+    security_groups = ["${aws_security_group.PublicElbSecurityGroup.id}"]
   }
   ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    prefix_list_ids = ["${aws_security_group.ProxySecurityGroup.id}"]
+    security_groups = ["${aws_security_group.PublicElbSecurityGroup.id}"]
   }
   egress {
     from_port       = 0
     to_port         = 0
     protocol        = "-1"
-    prefix_list_ids     = ["0.0.0.0/0"]
+    cidr_blocks     = ["0.0.0.0/0"]
   }
   tags {
     Name = "OuterProxySecurityGroup"
@@ -282,8 +285,8 @@ resource "aws_security_group" "OuterProxySecurityGroup" {
 
 resource "aws_elb" "ProxyELB" {
   name               = "ProxyELB"
-  availability_zones = ["${aws_subnet.PublicSubnet1.availability_zone}", "${aws_subnet.PublicSubnet2.availability_zone}"]
-  security_groups = ["${aws_security_group.ELBSecurityGroup.id}", "${aws_security_group.ProxySecurityGroup.id}"]
+  subnets = ["${aws_subnet.PublicSubnet1.id}", "${aws_subnet.PublicSubnet2.id}"]
+  security_groups = ["${aws_security_group.ELBSecurityGroup.id}", "${aws_security_group.PublicElbSecurityGroup.id}"]
 
   listener {
     instance_port     = 80
