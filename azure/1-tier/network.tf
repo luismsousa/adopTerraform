@@ -7,7 +7,7 @@ resource "azurerm_virtual_network" "sandboxNetwork" {
 }
 
 resource "azurerm_route_table" "sandboxRT" {
-  name                = "acceptanceTestSecurityGroup1"
+  name                = "sandboxRT"
   location            = "${azurerm_resource_group.sandbox.location}"
   resource_group_name = "${azurerm_resource_group.sandbox.name}"
   
@@ -31,6 +31,7 @@ resource "azurerm_subnet" "sandboxSubnet" {
   virtual_network_name = "${azurerm_virtual_network.sandboxNetwork.name}"
   address_prefix       = "172.31.64.0/28"
   network_security_group_id = "${azurerm_network_security_group.adopSecurityGroup.id}"
+  route_table_id = "${azurerm_route_table.sandboxRT.id}"
 }
 
 resource "azurerm_public_ip" "adopEIP" {
