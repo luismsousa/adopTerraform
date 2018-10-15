@@ -13,3 +13,7 @@ variable "adop_username" {
 variable "adop_password" {
   default = ""
 }
+
+variable "public_key" {
+  default = ""
+}
