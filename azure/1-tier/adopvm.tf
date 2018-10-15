@@ -2,6 +2,7 @@ resource "azurerm_network_interface" "adopMainNic" {
   name                = "adop-nic"
   location            = "${azurerm_resource_group.sandbox.location}"
   resource_group_name = "${azurerm_resource_group.sandbox.name}"
+  network_security_group_id = "${azurerm_network_security_group.adopSecurityGroup.id}"
 
   ip_configuration {
     name                          = "standard"
@@ -51,6 +52,7 @@ resource "azurerm_virtual_machine" "adopVM" {
           path = "/home/centos/.ssh/authorized_keys"
       }
   }
+  depends_on = ["azurerm_network_security_group.adopSecurityGroup", "azurerm_route_table.sandboxRT"]
 }
 
 resource "azurerm_virtual_machine_extension" "adopUserData" {
@@ -68,4 +70,5 @@ resource "azurerm_virtual_machine_extension" "adopUserData" {
     }
 SETTINGS
 
+  depends_on = ["azurerm_network_security_group.adopSecurityGroup", "azurerm_route_table.sandboxRT"]
 }

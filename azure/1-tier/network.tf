@@ -30,7 +30,6 @@ resource "azurerm_subnet" "sandboxSubnet" {
   resource_group_name  = "${azurerm_resource_group.sandbox.name}"
   virtual_network_name = "${azurerm_virtual_network.sandboxNetwork.name}"
   address_prefix       = "172.31.64.0/28"
-  network_security_group_id = "${azurerm_network_security_group.adopSecurityGroup.id}"
   route_table_id = "${azurerm_route_table.sandboxRT.id}"
 }
 
@@ -47,60 +46,70 @@ resource "azurerm_network_security_group" "adopSecurityGroup" {
   resource_group_name = "${azurerm_resource_group.sandbox.name}"
 
   security_rule {
-    name                       = "SSH"
-    priority                   = 100
+    name                       = "allow_SSH"
+    priority                   = 133
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
-    source_port_range          = "22"
+    source_port_range          = "*"
     destination_port_range     = "22"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
   security_rule {
-    name                       = "HTTP"
-    priority                   = 101
+    name                       = "allow_HTTP"
+    priority                   = 122
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
-    source_port_range          = "80"
+    source_port_range          = "*"
     destination_port_range     = "80"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
   security_rule {
-    name                       = "HTTPS"
-    priority                   = 102
+    name                       = "allow_HTTPS"
+    priority                   = 112
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
-    source_port_range          = "443"
+    source_port_range          = "*"
     destination_port_range     = "443"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
   security_rule {
-    name                       = "DockerTCP"
-    priority                   = 103
+    name                       = "allow_DockerTCP"
+    priority                   = 121
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Tcp"
-    source_port_range          = "2376"
+    source_port_range          = "*"
     destination_port_range     = "2376"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
   security_rule {
-    name                       = "DockerUDP"
-    priority                   = 104
+    name                       = "allow_DockerUDP"
+    priority                   = 120
     direction                  = "Inbound"
     access                     = "Allow"
     protocol                   = "Udp"
-    source_port_range          = "25826"
+    source_port_range          = "*"
     destination_port_range     = "25826"
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
 
-
+  security_rule {
+    name = "Internet_allow"
+    priority = 140
+    direction = "Outbound"
+    access = "Allow"
+    protocol = "*"
+    source_port_range = "*"
+    destination_port_range = "*"
+    source_address_prefix = "*"
+    destination_address_prefix = "Internet"
+ }
 }
