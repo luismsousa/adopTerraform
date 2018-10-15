@@ -30,4 +30,5 @@ resource "google_compute_instance" "adopvm" {
   metadata {
     sshKeys = "${var.adop_username}:${var.public_key}"
   }
+  tags = ["http-server"]
 }
