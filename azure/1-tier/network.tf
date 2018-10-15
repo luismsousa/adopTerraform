@@ -44,72 +44,74 @@ resource "azurerm_network_security_group" "adopSecurityGroup" {
   name                = "adopSecurityGroup"
   location            = "${azurerm_resource_group.sandbox.location}"
   resource_group_name = "${azurerm_resource_group.sandbox.name}"
+}
 
-  security_rule {
-    name                       = "allow_SSH"
-    priority                   = 133
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-  security_rule {
-    name                       = "allow_HTTP"
-    priority                   = 122
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "80"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-  security_rule {
-    name                       = "allow_HTTPS"
-    priority                   = 112
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "443"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-  security_rule {
-    name                       = "allow_DockerTCP"
-    priority                   = 121
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "2376"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-  security_rule {
-    name                       = "allow_DockerUDP"
-    priority                   = 120
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Udp"
-    source_port_range          = "*"
-    destination_port_range     = "25826"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
+resource "azurerm_network_security_rule" "allow_DockerUDP" {
+  name                       = "allow_DockerUDP"
+  priority                   = 120
+  direction                  = "Inbound"
+  access                     = "Allow"
+  protocol                   = "Udp"
+  source_port_range          = "*"
+  destination_port_range     = "25826"
+  source_address_prefix      = "*"
+  destination_address_prefix = "*"
+  resource_group_name         = "${azurerm_resource_group.sandbox.name}"
+  network_security_group_name = "${azurerm_network_security_group.adopSecurityGroup.name}"
+}
 
-  security_rule {
-    name = "Internet_allow"
-    priority = 140
-    direction = "Outbound"
-    access = "Allow"
-    protocol = "*"
-    source_port_range = "*"
-    destination_port_range = "*"
-    source_address_prefix = "*"
-    destination_address_prefix = "Internet"
- }
+resource "azurerm_network_security_rule" "allow_HTTPS" {
+  name                       = "allow_HTTPS"
+  priority                   = 112
+  direction                  = "Inbound"
+  access                     = "Allow"
+  protocol                   = "Tcp"
+  source_port_range          = "*"
+  destination_port_range     = "443"
+  source_address_prefix      = "*"
+  destination_address_prefix = "*"
+  resource_group_name         = "${azurerm_resource_group.sandbox.name}"
+  network_security_group_name = "${azurerm_network_security_group.adopSecurityGroup.name}"
+}
+
+resource "azurerm_network_security_rule" "allow_DockerTCP" {
+  name                       = "allow_DockerTCP"
+  priority                   = 121
+  direction                  = "Inbound"
+  access                     = "Allow"
+  protocol                   = "Tcp"
+  source_port_range          = "*"
+  destination_port_range     = "2376"
+  source_address_prefix      = "*"
+  destination_address_prefix = "*"
+  resource_group_name         = "${azurerm_resource_group.sandbox.name}"
+  network_security_group_name = "${azurerm_network_security_group.adopSecurityGroup.name}"
+}
+
+resource "azurerm_network_security_rule" "allow_HTTP" {
+  name                       = "allow_HTTP"
+  priority                   = 122
+  direction                  = "Inbound"
+  access                     = "Allow"
+  protocol                   = "Tcp"
+  source_port_range          = "*"
+  destination_port_range     = "80"
+  source_address_prefix      = "*"
+  destination_address_prefix = "*"
+  resource_group_name         = "${azurerm_resource_group.sandbox.name}"
+  network_security_group_name = "${azurerm_network_security_group.adopSecurityGroup.name}"
+}
+
+resource "azurerm_network_security_rule" "allow_SSH" {
+  name                       = "allow_SSH"
+  priority                   = 133
+  direction                  = "Inbound"
+  access                     = "Allow"
+  protocol                   = "Tcp"
+  source_port_range          = "*"
+  destination_port_range     = "22"
+  source_address_prefix      = "*"
+  destination_address_prefix = "*"
+  resource_group_name         = "${azurerm_resource_group.sandbox.name}"
+  network_security_group_name = "${azurerm_network_security_group.adopSecurityGroup.name}"
 }
