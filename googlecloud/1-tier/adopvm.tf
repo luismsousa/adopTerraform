@@ -28,6 +28,6 @@ resource "google_compute_instance" "adopvm" {
   metadata_startup_script = "sleep 30 && curl -L https://raw.githubusercontent.com/luismsousa/adopTerraform/master/googlecloud/1-tier/scripts/userData.sh > ~/userData.sh && chmod +x ~/userData.sh && export INITIAL_ADMIN_USER=${var.adop_username} && export INITIAL_ADMIN_PASSWORD_PLAIN=${var.adop_password} && cd ~/ && ./userData.sh"
 
   metadata {
-    sshKeys = "${var.adop_username}:${file(var.public_key)}"
+    sshKeys = "${var.adop_username}:${var.public_key}"
   }
 }
